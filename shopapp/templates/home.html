@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Catalog</title>
+</head>
+<body>
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Добро пожаловать в наш магазин!</h1>
+  <p>Здесь вы найдете широкий ассортимент товаров.</p>
+  <a class="btn btn-primary" href="{% url 'catalog' %}">Перейти в каталог</a>
+
+{% endblock content %}
+
+</body>
+</html>
