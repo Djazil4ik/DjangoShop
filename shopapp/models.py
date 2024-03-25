@@ -2,12 +2,12 @@ from django.db import models
 from django.utils.timezone import now
 
 class Seller(models.Model):
-    name = models.CharField(max_length=255)
-    about = models.TextField()
+    username = models.CharField(max_length=255)
+    about = models.TextField(blank=True)
     avatar = models.FileField(upload_to='project_images/', blank=True)
 
     def __str__(self):
-        return self.name
+        return self.username
 
 class Product(models.Model):
     title = models.CharField(max_length=255)

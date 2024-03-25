@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Profile</h1>
+
+<p>Username: {{ user.username }}</p>
+
+{% if user.profile.image %}
+<img src="{{ user.profile.image.url }}" alt="" width="100">
+{% endif %}
+
+{% if user.profile.about %}
+<p>About: {{ user.profile.about }}</p>
+{% endif %}
+
+{% if user.is_superuser %}
+<p>**Administrator**</p>
+{% endif %}
+
+{% if not user.is_staff %}
+<a href="{% url 'edit_profile' %}">Edit Profile</a>
+{% endif %}
+
+{% endblock %}
