@@ -1,8 +1,12 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+from django.contrib import messages
+from .forms import ProductForm, SellerForm
 from .models import Seller, Product
 from django.contrib.auth import login, logout
 
@@ -23,27 +27,48 @@ class SellerLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('home')
 
-class SignUpPage(FormView):
-    template_name = 'shopapp/signup.html'
-    form_class = UserCreationForm
-    redirect_authenticated_user = True
-    success_url = reverse_lazy('home')
+def SignUp(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
 
-    def form_valid(self, form):
-        user = form.save()
-        if user is not None:
-            login(self.request, user)
-        return super(SignUpPage, self).form_valid(form)
+        if password1 != password2:
+            messages.error(request, 'Passwords does no match')
+            return reverse_lazy('home')
 
-    def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('home')
-        return super(SignUpPage, self).get(*args, **kwargs)
+        user = User.objects.create_user(username, password1)
+        user.save()
+        return render(request, 'shopapp/login.html')
+    form = UserCreationForm()
+    return render(request, 'shopapp/signup.html', {'form': form})
 
 def logout_view(request):
     logout(request)
     # Redirect to desired page after logout (e.g., login page)
-    return redirect('login')
+    return redirect('home')
 
 def profile(request):
     return render(request, 'profile.html')
+
+def detail_view(request, slug):
+    product = Product.objects.get(slug=slug)
+    context = {
+        'product': product
+    }
+    return render(request, 'product_detail.html', context)
+
+@login_required(login_url='/login')
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.seller = request.user
+            post.save()
+            obj = form.instance
+            alert = True
+            return render(request, 'add_product.html', {'obj': obj, 'alert': alert})
+    else:
+        form = ProductForm()
+        return render(request, 'add_product.html', {'form': form})

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Product</title>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block add_blogs_active %} active {% endblock add_blogs_active %}
+{% block css %}
+{% endblock %}
+{% block body %}
+<div style="margin: 10px"><h1>Add Product</h1></div>
+<form action="/add_product/" enctype="multipart/form-data" method="POST">
+    {% csrf_token %}
+    <div class="container mt-4">
+        {{ form.as_p }}
+        <button class="btn btn-primary">Add Product</button>
+    </div>
+</form>
+
+{% endblock %}
+{% block js %}
+<script>
+  if ({{ alert }}) {
+    alert('Your Blog is added successfully.');
+    document.location = '/';
+  }
+</script>
+{% endblock %}
+</body>
+</html>
