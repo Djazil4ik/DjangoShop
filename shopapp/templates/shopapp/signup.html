@@ -8,14 +8,14 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="header-bar">
-    <h1>Signup</h1>
+    <h1>Sig Up</h1>
 </div>
 
 <div class="card-body">
     <form method="POST">
         {% csrf_token %}
         <div>{{ form.as_p }}</div>
-        <input class="button" style="margin-top: 10px" type="submit" value="register">
+        <input class="button" style="margin-top: 10px" type="submit" value="Sign Up">
     </form>
     <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
 </div>

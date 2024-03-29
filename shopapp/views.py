@@ -8,25 +8,41 @@ from django.views.generic import FormView
 from django.contrib import messages
 from .forms import ProductForm, SellerForm
 from .models import Seller, Product
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 
+
+# catalog
 def catalog(request):
     Product.objects.all()
     product = Product.objects.filter().order_by('-datetime')
     return render(request, 'catalog.html', {'product': product})
 
+# home page
 def home(request):
     context = {}  # Empty context for now
     return render(request, 'home.html', context)
 
-class SellerLoginView(LoginView):
-    template_name = 'shopapp/login.html'
-    fields = '__all__'
-    redirect_authenticated_user = True
+# Seller login
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        # Authenticate the user
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            # Login the user if successful
+            login(request, user)
+            return redirect('/')  # Redirect to homepage after successful login
+        else:
+            # Authentication failed, display error message
+            error_message = 'Invalid username or password.'
+    else:
+        # GET request, render the login form template
+        error_message = None  # Clear any previous error messages for GET requests
+    context = {'error_message': error_message, 'form': SellerForm}
+    return render(request, 'shopapp/login.html', context)
 
-    def get_success_url(self):
-        return reverse_lazy('home')
-
+# Sign Up
 def SignUp(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -35,11 +51,11 @@ def SignUp(request):
 
         if password1 != password2:
             messages.error(request, 'Passwords does no match')
-            return reverse_lazy('home')
+            return redirect('/')
 
-        user = User.objects.create_user(username, password1)
+        user = User.objects.create_user(username=username, password=password1)
         user.save()
-        return render(request, 'shopapp/login.html')
+        return redirect('login')
     form = UserCreationForm()
     return render(request, 'shopapp/signup.html', {'form': form})
 
@@ -62,13 +78,14 @@ def detail_view(request, slug):
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(data=request.POST, files=request.FILES)
+        seller = Seller.objects.create(username=request.user)
         if form.is_valid():
             post = form.save(commit=False)
-            post.seller = request.user
+            post.seller = seller
             post.save()
             obj = form.instance
             alert = True
-            return render(request, 'add_product.html', {'obj': obj, 'alert': alert})
+            return render(request, 'catalog.html', {'obj': obj, 'alert': alert})
     else:
         form = ProductForm()
         return render(request, 'add_product.html', {'form': form})
