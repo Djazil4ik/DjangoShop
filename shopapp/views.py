@@ -4,23 +4,18 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, UpdateView
 from django.contrib import messages
 from .forms import ProductForm, SellerForm
 from .models import Seller, Product
 from django.contrib.auth import login, logout, authenticate
 
 
-# catalog
+# Home page
 def catalog(request):
     Product.objects.all()
     product = Product.objects.filter().order_by('-datetime')
     return render(request, 'catalog.html', {'product': product})
-
-# home page
-def home(request):
-    context = {}  # Empty context for now
-    return render(request, 'home.html', context)
 
 # Seller login
 def login_view(request):
@@ -54,38 +49,73 @@ def SignUp(request):
             return redirect('/')
 
         user = User.objects.create_user(username=username, password=password1)
+        seller = Seller.objects.create(username=username)
         user.save()
         return redirect('login')
     form = UserCreationForm()
     return render(request, 'shopapp/signup.html', {'form': form})
 
+# Logout
 def logout_view(request):
     logout(request)
     # Redirect to desired page after logout (e.g., login page)
-    return redirect('home')
+    return redirect('catalog')
 
+# Profile
 def profile(request):
-    return render(request, 'profile.html')
+    seller = Seller.objects.get(pk=request.user.id)
+    return render(request, 'profile.html', {'seller': seller})
 
+# Product detail view
 def detail_view(request, slug):
-    product = Product.objects.get(slug=slug)
+    product = Product.objects.filter(slug=slug).first()
     context = {
         'product': product
     }
     return render(request, 'product_detail.html', context)
 
+# Add product
 @login_required(login_url='/login')
 def add_product(request):
     if request.method == 'POST':
+        seller = Seller.objects.filter(username=request.user).first()
         form = ProductForm(data=request.POST, files=request.FILES)
-        seller = Seller.objects.create(username=request.user)
         if form.is_valid():
             post = form.save(commit=False)
             post.seller = seller
             post.save()
-            obj = form.instance
-            alert = True
-            return render(request, 'catalog.html', {'obj': obj, 'alert': alert})
+            return redirect('/')
     else:
         form = ProductForm()
         return render(request, 'add_product.html', {'form': form})
+
+# Delete product post
+def Delete_Product(request, slug):
+    products = Product.objects.get(slug=slug)
+    if request.method == 'POST':
+        products.delete()
+        return redirect('/')
+    return render(request, 'delete_product.html', {'products': products})
+
+# Edit product post
+def Update_Product(request, slug):
+    product = Product.objects.get(slug=slug)
+    if request.method == 'POST':
+        form = ProductForm(data=request.POST, files=request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'edit_product.html', {'form': form})
+
+def edit_seller_profile(request):
+    seller = Seller.objects.get(pk=request.user.id)
+    if request.method == 'POST':
+        form = SellerForm(data=request.POST, files=request.FILES, instance=seller)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    else:
+        form = SellerForm(instance=seller)
+    return render(request, 'edit_profile.html', {'form': form})

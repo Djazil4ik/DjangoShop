@@ -2,23 +2,22 @@
 
 {% block content %}
 <h1>Profile</h1>
-
+<div class="container mt-4">
 <p>Username: {{ user.username }}</p>
-
-{% if user.profile.image %}
-<img src="{{ user.profile.image.url }}" alt="" width="100">
+</div>
+{% if seller.avatar %}
+<img src="{{ seller.avatar.url }}" alt="" width="200px" height="200px">
 {% endif %}
 
-{% if user.profile.about %}
-<p>About: {{ user.profile.about }}</p>
+{% if seller.about %}
+<p>About: {{ seller.about }}</p>
 {% endif %}
 
 {% if user.is_superuser %}
 <p>**Administrator**</p>
 {% endif %}
-
-{% if not user.is_staff %}
-<a href="{% url 'edit_profile' %}">Edit Profile</a>
-{% endif %}
+<div style="margin:5px">
+<a class="btn btn-primary" href="/edit_profile/">Edit Profile</a>
+</div>
 
 {% endblock %}

@@ -7,11 +7,12 @@
 </head>
 <body>
 {% block content %}
+<div class="card-body" style="margin-left: 10px; margin-right: 10px;">
 <h1>{{ product.title }}</h1>
 <div class="row">
     <div class="col-md-8">
         {% if product.img %}
-        <img src="{{ product.img.url }}" width="100%">
+        <img src="{{ product.img.url }}" width="50%">
         {% endif %}
     </div>
     <div class="col-md-4">
@@ -20,11 +21,14 @@
         <br>
         <h5>Price</h5>
         <p>${{ product.price }}</p>
-        <a href="{% url 'home' %}" class="btn btn-primary">Back</a>
+        {% if product.seller.username == request.user.username %}
+        <a href="/edit_product/{{product.slug}}" class="btn btn-primary">Edit post</a>
+        <a href="/delete_product/{{product.slug}}" class="btn btn-danger mx-4">Delete Product</a>
+        {% endif %}
+        <a href="{% url 'catalog' %}" class="btn btn-primary">Back</a>
     </div>
-
 </div>
-
+</div>
 {% endblock content %}
 </body>
 </html>

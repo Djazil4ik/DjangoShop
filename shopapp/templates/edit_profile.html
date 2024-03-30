@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% extends 'base.html' %}
+    <meta charset="UTF-8">
+    <title>{{request.user.username}}</title>
+</head>
+<body>
+{% block content %}
+<form action="/edit_profile/" enctype="multipart/form-data" method="POST">
+    {% csrf_token %}
+    <div class="container mt-3">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </div>
+</form>
+{% endblock %}
+</body>
+</html>

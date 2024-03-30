@@ -5,7 +5,7 @@ from .models import Seller, Product
 class SellerForm(ModelForm):
     class Meta:
         model = Seller
-        fields = ('username', 'avatar')
+        fields = ('username', 'about', 'avatar')
 
 class ProductForm(ModelForm):
     class Meta:

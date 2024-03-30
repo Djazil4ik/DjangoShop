@@ -13,11 +13,12 @@
   <div class="row">
     {% for post in product %}
     <div class="col-lg my-4">
-      <div class="card shadow" style="width: 20rem; height: 35rem;">
+      <div class="card shadow" style="width: 20rem; height: 38rem;">
         <img src="/media/{{post.img}}" class="card-img-top" alt="..." height="330px">
         <div class="card-body">
           <h5 class="card-title">{{post.title}}<br><small>by {{post.seller}}</small></h5>
           <p class="card-text">{{post.description| truncatechars:100}}</p>
+          <p class="card-title">Price: ${{post.price}}</p>
           <a href="product/{{post.slug}}" class="btn btn-primary">Read More {% if user.is_superuser %}<a href="delete_product/{{post.slug}}/" class="btn btn-danger mx-4">Delete Product</a>{% endif %}</a>
         </div>
       </div>
