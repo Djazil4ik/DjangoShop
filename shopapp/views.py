@@ -1,14 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views.generic import FormView, UpdateView
 from django.contrib import messages
 from .forms import ProductForm, SellerForm
 from .models import Seller, Product
 from django.contrib.auth import login, logout, authenticate
+from rest_framework import viewsets
+from .serializers import SellerSerializer, ProductSerializer
 
 
 # Home page
@@ -119,3 +118,13 @@ def edit_seller_profile(request):
     else:
         form = SellerForm(instance=seller)
     return render(request, 'edit_profile.html', {'form': form})
+
+# --------------------------
+
+class SellerViewSet(viewsets.ModelViewSet):
+    queryset = Seller.objects.all()
+    serializer_class = SellerSerializer
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
